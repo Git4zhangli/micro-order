@@ -1,0 +1,142 @@
+server:
+  #指定服务启动端口
+  port: 13000
+  compression:
+    enabled: true
+    mime-types: 'text/html,text/xml,text/css,text/javascript,text/plain'
+  tomcat:
+    max-connections: 1000
+    max-threads: 800
+
+spring:
+  boot:
+    admin:
+      client:
+        #服务在admin管理优先使用IP注册
+        prefer-ip: true
+
+#mybatis相关配置        
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:mybatis/*Mapper.xml
+  type-aliases-package: com.xs.micro.order.domain.pojo.model
+  
+endpoints: 
+  shutdown:
+    enabled: true     #启动shutdown
+    sensitive: false  #禁用密码验证
+        
+management:
+  security:
+    #管理后台安全认证关闭
+    enabled: false
+    
+    
+app:  
+  conf:  
+    project: 
+      title:  ${APP_TITLE:'订单测试项目'}
+      description:  |-
+        '本项目用来培训的demo，列举了一下内容的培训：微服务技术规范、动态配置加载（消息总线）、bean的创建、事务方法bus和service方法区分、feign调用+断路器、统一异常处理……' 
+        '扩展内容：分页插件、分布式事务、swagger2文档'
+    administrators: 
+      info: 系统管理员介绍 
+      administrator: 
+        username: zhangsan
+        grants:  
+          - 查看
+          - 新增
+          - 修改
+
+person: 
+  first:  
+    name: xiangshang360
+
+---
+spring:
+  #指定本地电脑配置
+  profiles: local
+  #设置使用的数据源，{cipher}开头的配置需要进行安全解密，后面跟的是加密字符串，具体生成方式见wiki文档
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/inst01
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+  #设置使用的rabbitmq
+  rabbitmq: 
+    host: rabbitmq.xs.dev
+    port: 5672
+    virtual-host: xs_micro
+    username: micro
+    password: micro
+    #password: '{cipher}d683d0a0ddde14d21c1caba02e9b975dbad8dca6000cd35622525b0c1655b921'
+  #设置zipkin的span收集地址，将路径信息发送到指定的地址上，然后通过zipkin即可查看每次调用，并可以查看服务之间的调用关系
+  zipkin:
+    base-url: http://10.40.3.221:18100
+  #服务管理后台程序地址，服务启动后会将自己的健康检查，info，度量，等endpoint注册到后台管理服务上，后台管理服务提供UI界面查看已注册服务的状态、性能指标、日志等信息
+  boot:
+    admin:
+      url: http://10.40.3.221:18000
+
+#日志配置（此配置将覆盖bootstrap.yml中的配置）
+logging:
+  level:
+    root: INFO
+          
+---
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://10.200.3.2:3306/xiangshang_usercenter
+    username: root
+    password: '{cipher}2a2a9ea42f51b8010cc2a72eb2254d1d78a1bfad3274dd4e924bc6150fe8cd5e' #root123456
+    driver-class-name: com.mysql.jdbc.Driver
+  rabbitmq: 
+    host: rabbitmq.xs.dev
+    port: 5672
+    virtual-host: xs_micro
+    username: micro
+    password: '{cipher}d683d0a0ddde14d21c1caba02e9b975dbad8dca6000cd35622525b0c1655b921' #micro
+  zipkin:
+    base-url: http://10.40.3.221:18100
+  boot:
+    admin:
+      url: http://10.40.1.235:18000
+
+---
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:mysql://x.x.x.x:3306/xiangshang_usercenter
+    username: develop
+    password: '{cipher}c66923a22c29c44b59bc777eaf5592b65e7c21735439df582ad57ca648ea3475' #xs_dev
+    driver-class-name: com.mysql.jdbc.Driver
+  rabbitmq:
+    host: x.x.x.x
+    port: 5672
+    username: root
+    password: '{cipher}7873207bec29d88d8405c68c678893fdc6e6584c4c4caeab24e89dfbaec3d588' #123456
+  zipkin:
+    base-url: http://x.x.x.x:18100
+  boot:
+    admin:
+      url: http://x.x.x.x:18000
+
+---
+spring:
+  profiles: online
+  datasource:
+    url: jdbc:mysql://y.y.y.y:3306/xiangshang_usercenter
+    username: develop
+    password: '{cipher}c66923a22c29c44b59bc777eaf5592b65e7c21735439df582ad57ca648ea3475' #xs_dev
+    driver-class-name: com.mysql.jdbc.Driver
+  rabbitmq:
+    host: y.y.y.y
+    port: 5672
+    username: root
+    password: '{cipher}7873207bec29d88d8405c68c678893fdc6e6584c4c4caeab24e89dfbaec3d588' #123456
+  zipkin:
+    base-url: http://y.y.y.y:18100
+  boot:
+    admin:
+      url: http://y.y.y.y:18000

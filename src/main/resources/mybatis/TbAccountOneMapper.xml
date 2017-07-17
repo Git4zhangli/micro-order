@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xs.micro.order.domain.dao.TbAccountOneMapper">
+	<sql id="cloumsForTable">
+		id AS id,
+		acct_id AS acctId,
+		amount AS amount,
+		frozen AS frozen,
+		sex AS sex,
+		version AS version
+	</sql>
+	
+	<select id="queryByAcctId" resultType="com.xs.micro.order.domain.pojo.model.TbAccountOne">
+		SELECT
+			<include refid="cloumsForTable" />
+		FROM
+			`tb_account_one`
+		WHERE
+			acct_id = #{acctId}
+	</select>
+	
+	<select id="queryByAll" resultType="com.xs.micro.order.domain.pojo.model.TbAccountOne">
+  		SELECT
+			<include refid="cloumsForTable" />
+		FROM
+			`tb_account_one`
+	</select>
+
+	<insert id="insert" keyProperty="id" parameterType="com.xs.micro.order.domain.pojo.model.TbAccountOne">
+		INSERT INTO `tb_account_one` (`acct_id`, `amount`, `frozen`, `sex`) VALUES (#{acctId}, #{amount}, #{frozen}, #{sex})
+	</insert>
+	
+	<update id="fundChange">
+		UPDATE `tb_account_one` SET `amount`=#{amount}, `frozen`=#{frozen}, `version`=`version`+1 WHERE `acct_id`=#{acctId} AND `version`=#{version}
+	</update>
+</mapper>

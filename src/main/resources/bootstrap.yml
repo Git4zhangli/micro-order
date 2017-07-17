@@ -1,0 +1,94 @@
+spring:
+  application:
+    #micro-order 定义应用程序名称(在POM文件中加载，需要在POM文件中配置插件实现 见 ‘maven-resources-plugin’)
+    name: '@pom.name@' 
+  profiles:
+    #设定默认激活的profile
+    active: local
+  cloud:
+    config:
+      enabled:  false
+      discovery:
+        enabled: true
+        #自动在服务发现中心获取“统一配置中心服务”
+        service-id: micro-config
+      failFast: true
+      
+eureka:
+  instance:
+    #注册时优先使用IP地址注册到“服务发现中心”
+    prefer-ip-address: true
+    
+security:  
+  basic:  
+    #禁用springboot安全
+    enabled: false  
+
+encrypt: 
+  #定义密码加密key值，将
+  key: xsjf123.com #或使用环境变量ENCRYPT_KEY将其从纯文本配置文件中删除
+
+logging:
+  #logback配置文件
+  config: classpath:logback-spring.xml
+  #日志文件名称
+  file: '@pom.name@'
+  #日志文件路径
+  path: '/xs/logs/@pom.name@/'
+  #日志文件级别（在bootstrap文件中可以配置默认值，可以在application.yml中进行覆盖，或是在执行的profile配置中覆盖）
+  #注意：不要修改此处配置，如果想修改执行环境的日志级别，可修改执行profile中的日志级别，覆盖此默认配置
+  #可选配置：TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+  level:
+    root: INFO
+
+#项目信息，用info做前缀的配置将在admin管理后台中进行显示，属性可以自己定义没有强制要求，例如可以设置info.contact.email
+info:
+  build:
+    name: '@pom.name@'
+    description: '@pom.description@'
+    version: '@pom.version@'
+
+#下面是yml指定profile的语法，用---分割，第一个属性设置必须是spring.profiles,来指定设置的profile名称
+
+---
+spring:
+  profiles: local
+
+#设置服务注册中心地址，因为user服务依赖config服务，所以必须在bootstrap.yml中配置euraka，这样才能在服务启动时正确的从config中获取配置
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://10.40.3.221:14100/eureka/
+  instance:
+    lease-expiration-duration-in-seconds: 6 #最后一次心跳时间后X秒就认为是下线了，默认是90秒
+    lease-renewal-interval-in-seconds: 3 #心跳间隔时间,默认是30秒
+          
+---
+spring:
+  profiles: dev
+  
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://10.40.3.221:14100/eureka/
+  instance:
+    lease-expiration-duration-in-seconds: 6
+    lease-renewal-interval-in-seconds: 3
+          
+---
+spring:
+  profiles: test
+  
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://x.x.x.x:14100/eureka/
+    
+---
+spring:
+  profiles: online
+  
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://y.y.y.y:14100/eureka/
